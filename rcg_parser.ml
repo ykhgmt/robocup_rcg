@@ -2,7 +2,6 @@
 open Sexplib.Sexp;;
 #require "sexplib";;
 
-
 (*
 module Sexp : sig
   type t =
@@ -15,13 +14,16 @@ let parsep =
 "((l 1) 0 0x9 -49 0 0 0 2.327 0 (v h 180) (s 8000 1 1 130600) (c 0 0 906 0 1 907 1 0 0 0 0))";;
 
 type agent =
-  Pos_x of int
+ Label of int
+| Pos_x of int
 | Pos_y of int
-| Label of int
+| V_x of int
+| V_y of int
+
 ;;
 
 type agent_inf =
-  Record of  (agent * agent * agent)
+  Record of  (agent * agent * agent * agent * agent)
 ;;
 
 (* string -> t*)
@@ -34,22 +36,34 @@ let matching a =
   | _ -> failwith "NO"
 ;;
 
-let matching2 a =
-  match a with
-    List ( List ( Atom "l" :: [Atom num]) :: b1 :: b2
-           :: (Atom x) :: (Atom y) :: (Atom xv) :: (Atom yv)
-           :: b3 :: b4 :: rest2) ->
-      Record (Label (int_of_string num) ,
-              Pos_x (int_of_string x) , Pos_y (int_of_string y))
-  | _ -> failwith "NO"
+let matching2 s =
+  let matching2 s =
+    match s with
+      List ( List ( Atom "l" :: [Atom num]) :: b1 :: b2
+             :: (Atom x) :: (Atom y) :: (Atom vx) :: (Atom vy)
+             :: b3 :: b4
+             :: List (Atom "v" :: rest1)
+             :: List (Atom "s" :: rest2)
+             :: List (Atom "c" :: rest3)
+             :: rest4)
+      ->
+        Record (Label (int_of_string num) ,
+                Pos_x (int_of_string x) ,
+                Pos_y (int_of_string y) ,
+                V_x (int_of_string vx) ,
+                V_y (int_of_string vy))
+    | _ -> failwith "NO"
+
+  in
+  let lex = Lexing.from_string s in
+  matching2 (scan_sexp lex)
 ;;
 
 
 (* test *)
 (*matching (lexing parsep);;*)
 matching (lexing "((l a) a  (d e))");;
-matching2 (lexing parsep)
-
+matching2 parsep;;
 
 (* string -> rcg *)
 (*
