@@ -22,8 +22,20 @@ let s_parse2 =
 ((l 2) 3 0x1 -25 -5 0 0 78.518 0 (v h 180) (s 8000 0.901147 1 130600) (c 0 0 887 0 1 888 1 0 0 0 0))
 )";;
 
+let str = In_channel.input_all(In_channel.create("helios-test_prot.txt"));;
+
+let show = "(show 1 ((b) 0 0 0 0))";;
+
 type agent =
-  Label of int
+  Team of string
+| Label of int
+| Pos_x of int
+| Pos_y of int
+| V_x of int
+| V_y of int
+;;
+
+type ball =
 | Pos_x of int
 | Pos_y of int
 | V_x of int
@@ -31,8 +43,20 @@ type agent =
 ;;
 
 type agent_inf =
-  Record of  (agent * agent * agent * agent * agent)
-| Records of  (agent * agent * agent * agent * agent) list
+  Record of  (agent * agent * agent * agent * agent * agent)
+| Records of  (agent * agent * agent * agent * agent * agent) list
+;;
+
+(*
+type cycle =
+  Show of int
+| Agent of agent_inf
+| Ball of ball;;
+*)
+
+type rcg =
+  Cycle of (int * ball * agent_inf)
+| Cycles of (int * ball * agent_inf) list
 ;;
 
 (* string -> t*)
@@ -46,14 +70,30 @@ let matching a =
 
 let rec get_records s =
   match s with
-  | Record (a1 , a2 , a3 , a4 , a5 )-> (a1,a2,a3,a4,a5)
+  | Record (a1,a2,a3,a4,a5,a6) -> (a1,a2,a3,a4,a5,a6)
   | _ -> failwith "fail get_records"
 ;;
+
+let rec parse2 s =
+  match s with
+  | List(Atom "show" :: Atom cycle
+         :: List(List[Atom "b"]
+                 :: Atom x :: Atom y ::Atom vx :: Atom vy ::[])
+         :: [])
+    -> cycle
+    (*| List(rs) ->
+      Records(List.map ~f:(fun r ->
+      get_records (parse2 r) ) rs)
+    *)
+    | _ -> failwith "fail"
+;;
+
+parse2 (lexing show);;
 
 let rec parse s =
   match s with
   | (List
-       (List( Atom a :: [Atom num])
+       (List( Atom team :: [Atom num])
         :: b1 :: b2
         :: (Atom x) :: (Atom y) :: (Atom vx) :: (Atom vy)
         :: b3 :: b4
@@ -64,6 +104,7 @@ let rec parse s =
        ))
     ->
     Record (
+      Team (team) ,
       Label (int_of_string num) ,
       Pos_x (int_of_string x) ,
       Pos_y (int_of_string y) ,
@@ -71,7 +112,7 @@ let rec parse s =
       V_y (int_of_string vy)
     )
   | List(rs) ->
-    Records(List.map (fun r ->
+    Records(List.map ~f:(fun r ->
       get_records (parse r) ) rs)
   | _ -> failwith "fail"
 ;;
@@ -86,3 +127,5 @@ let parse_lex s =
 matching (lexing "((l a) a (d e))");;
 parse_lex s_parse1;;
 parse_lex s_parse2;;
+lexing str;;
+(*parse_lex str;;*)
