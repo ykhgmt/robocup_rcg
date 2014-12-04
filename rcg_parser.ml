@@ -36,10 +36,15 @@ type agent =
 ;;
 
 type ball =
-| Pos_x of int
-| Pos_y of int
-| V_x of int
-| V_y of int
+| B_Pos_x of int
+| B_Pos_y of int
+| B_V_x of int
+| B_V_y of int
+;;
+
+type ball_inf =
+  Record_b of  (ball * ball * ball * ball)
+| Records_b of  (ball * ball * ball * ball) list
 ;;
 
 type agent_inf =
@@ -55,8 +60,13 @@ type cycle =
 *)
 
 type rcg =
-  Cycle of (int * ball * agent_inf)
-| Cycles of (int * ball * agent_inf) list
+  Ball_inf of ball_inf
+| Record_b of  (ball * ball * ball * ball * ball * ball)
+| Records_b of  (ball * ball * ball * ball * ball * ball) list
+| Record of  (agent * agent * agent * agent * agent * agent)
+| Records of  (agent * agent * agent * agent * agent * agent) list
+| Cycle of (int * ball_inf * agent_inf)
+| Cycles of (int * ball_inf * agent_inf) list
 ;;
 
 (* string -> t*)
@@ -74,6 +84,12 @@ let rec get_records s =
   | _ -> failwith "fail get_records"
 ;;
 
+let rec set_records_b s =
+  match s with
+  | (a1,a2,a3,a4) -> (B_Pos_x a1, B_Pos_y a2, B_V_x a3, B_V_y a4)
+  | _ -> failwith "fail get_records"
+;;
+
 let rec parse2 s =
   match s with
   | List(Atom "show" :: Atom cycle
@@ -81,17 +97,23 @@ let rec parse2 s =
                  :: Atom x :: Atom y ::Atom vx :: Atom vy ::[])
          :: [])
     -> cycle
-    (*| List(rs) ->
-      Records(List.map ~f:(fun r ->
-      get_records (parse2 r) ) rs)
-    *)
-    | _ -> failwith "fail"
+  (*| List(rs) ->
+    Records(List.map ~f:(fun r ->
+    get_records (parse2 r) ) rs)
+  *)
+  | _ -> failwith "fail"
 ;;
 
 parse2 (lexing show);;
 
 let rec parse s =
   match s with
+(*  | List(Atom "show" :: Atom cycle
+         :: List(List[Atom "b"]
+                 :: Atom x :: Atom y ::Atom vx :: Atom vy ::[])
+         :: [])
+    -> cycle
+*)
   | (List
        (List( Atom team :: [Atom num])
         :: b1 :: b2
@@ -112,8 +134,14 @@ let rec parse s =
       V_y (int_of_string vy)
     )
   | List(rs) ->
-    Records(List.map ~f:(fun r ->
-      get_records (parse r) ) rs)
+(*    Cycle(1,
+          Record_b (set_records_b(
+            parse rs
+(*1,2,3,4*))
+          ),
+*)
+          Records(List.map ~f:(fun r -> get_records (parse r) ) rs)
+(*    ) *)
   | _ -> failwith "fail"
 ;;
 
