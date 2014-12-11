@@ -1,5 +1,6 @@
-(* open Sexp;; *)
-(*open Core;;
+open Sexp;;
+(*
+open Core;;
 open Core.Std;;
 *)
 open Sexplib.Sexp;;
@@ -13,12 +14,7 @@ module Sexp : sig
 end
 *)
 
-let str = In_channel.input_all(In_channel.create("helios-test_prot3.txt"));;
-
-(*
-let str = "(show 1 ((b) 0 0 0 0) ((l 1) 0 0x9 -49 0 0 0 2.327 0 (v h 180) (s 8000 1 1 130600) (c 0 0 906 0 1 907 1 0 0 0 0)))"
-*)
-let show = "(show 1 ((b) 0 0 0 0))";;
+let str = In_channel.input_all(In_channel.create("helios-test.txt"));;
 
 type agent =
   Team of string
@@ -49,8 +45,16 @@ type ab_elm =
 type sec =
 | Cycle of int;;
 
+type point =
+| Point of int;;
+
+type mode =
+| Mode of string;;
+
 type rcg =
-| Rcg of (sec * agent_ball list)
+| Rcg_m of ( mode )
+| Rcg_p of ( point * point )
+| Rcg_ab of ( sec * agent_ball list )
 ;;
 
 type elm =
@@ -112,12 +116,19 @@ let rec parse_agent r =
       V_x (Float.of_string vx) ,
       V_y (Float.of_string vy)
      ))
+  | _ -> failwith "fail parse_agent"
 ;;
 
 let rec parse s =
   match s with
+  | List(Atom "playmode" :: Atom a :: Atom mode :: [])
+    -> Record(Rcg_m(Mode mode))
+  | List(Atom "team" :: Atom a1 :: Atom tl :: Atom tr
+         :: Atom tl_p :: Atom tr_p :: [])
+    -> Record(Rcg_p( Point (int_of_string tl_p) ,
+                     Point (int_of_string tr_p)))
   | List(Atom "show" :: Atom sec :: rest)
-    -> Record(Rcg(Cycle (int_of_string sec) , List.map ~f:parse_agent rest))
+    -> Record(Rcg_ab(Cycle (int_of_string sec) , List.map ~f:parse_agent rest))
   | List(rs) ->
     Records(List.map ~f:(fun r -> get_records (parse r) ) rs)
 ;;
@@ -128,26 +139,15 @@ let rec parse_t_list s =
   | _ -> failwith "fail parse_agent"
 ;;
 
-
 let parse_lex s =
   let lex = Lexing.from_string s
   in parse (scan_sexp lex)
 ;;
 
 (* test *)
-(*matching (lexing parsep);;*)
 (*
 #trace get_records;;
 #trace parse_agent;;
 *)
-(*
-parse_lex s_parse1;;
-parse_lex s_parse2;;
-*)
 
 parse_lex str;;
-
-(*
-lexing str;;
-*)
-(* parse_lex str;; *)
