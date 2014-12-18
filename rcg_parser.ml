@@ -14,6 +14,7 @@ module Sexp : sig
 end
 *)
 
+let str = In_channel.input_all(In_channel.create("helios-test_small.txt"));;
 let str = In_channel.input_all(In_channel.create("helios-test.txt"));;
 
 type agent =
@@ -42,17 +43,14 @@ type ab_elm =
 | Records_ab of agent_ball list
 ;;
 
-type sec =
-| Cycle of int;;
+type sec = Cycle of int;;
 
-type point =
-| Point of int;;
+type point = Point of int;;
 
-type mode =
-| Mode of string;;
+type mode = Mode of string;;
 
 type rcg =
-| Rcg_m of ( mode )
+| Rcg_m of mode
 | Rcg_p of ( point * point )
 | Rcg_ab of ( sec * agent_ball list )
 ;;
@@ -131,12 +129,7 @@ let rec parse s =
     -> Record(Rcg_ab(Cycle (int_of_string sec) , List.map ~f:parse_agent rest))
   | List(rs) ->
     Records(List.map ~f:(fun r -> get_records (parse r) ) rs)
-;;
-
-let rec parse_t_list s =
-  match s with
-  | List(rs) -> rs
-  | _ -> failwith "fail parse_agent"
+  | _ -> failwith "fail parse"
 ;;
 
 let parse_lex s =
@@ -146,8 +139,13 @@ let parse_lex s =
 
 (* test *)
 (*
-#trace get_records;;
-#trace parse_agent;;
+let rec parse_t_list s =
+  match s with
+  | List(rs) -> rs
+  | _ -> failwith "fail parse_agent"
+;;
+ #trace parse;;
+ #trace parse_agent;;
 *)
 
-parse_lex str;;
+let rcg_data = parse_lex str;;

@@ -1,3 +1,6 @@
+open Pervasives;;
+
+(*
 type dis =
 | Dis of float
 ;;
@@ -14,6 +17,8 @@ type agent_distance =
 | Record_dis of (sec * agent_dist list)
 | Records_dis of (sec * agent_dist list) list
 ;;
+
+*)
 
 let rcg_matc op =
   match op with
@@ -36,71 +41,93 @@ let elm_agent e =
   | _ -> failwith "fail calc_dis"
 ;;
 
-let test_data = elm_agent data;;
+let test_data = elm_agent rcg_data;;
 
-let ballx , bally =
-  let get_ball_x_y c =
-    match c with
-    | [] -> failwith "fail"
-    | (Cycle num , rest) :: rest2 ->
-      match rest with
-      | [] -> failwith "fail"
-      | Ball(B_Pos_x x,B_Pos_y y,B_V_x vx, B_V_y vy) :: t ->
-        (x,y)
-      | _ -> failwith "fail"
-  in get_ball_x_y test_data
-;;
-
-let test2 =
-  let agent_inf_dd c =
-    match c with
-    | [] -> []
-    | (Cycle num , rest) :: rest2 ->
-      match rest with
-      | [] -> failwith "fail"
-      | h :: t -> t
-  in agent_inf_dd test_data
-;;
-
-let test =
-  function
-  | Agent (Team str , Label l, Pos_x x, Pos_y y, V_x vx, V_y vy)
-    -> sqrt(((x -. ballx) ** 2.0) +. (y -. bally) ** 2.0)
-;;
-
-List.map ~f:test test2;;
-
-
-(*
-let ttt c =
+let rec get_ball_x_y c =
   match c with
-  | [] -> failwith "fail"
+  | [] -> []
   | (Cycle num , rest) :: rest2 ->
     match rest with
     | [] -> failwith "fail"
-    | h :: Agent(t) -> Agent(t)
-in
-let get_ballx_y a =
-  match a with
-  | [] -> failwith "fail"
-  | Agent(Team a1,Label a2,Pos_x a3,Pos_y a4,a5,a6) :: rest2
-    -> a1
-in get_ballx_y ttt
+    | Ball(B_Pos_x x,B_Pos_y y,B_V_x vx, B_V_y vy) :: t ->
+      (x,y) :: get_ball_x_y rest2
+    | _ -> failwith "fail"
 ;;
 
-get_ballx_y (elm_agent data);;
-*)
+let ball_xy = get_ball_x_y test_data;;
 
-(*
-let calc_dis4 a =
-
+let rec get_aget_ball_list c =
+  match c with
+  | [] -> []
+  | (Cycle num , rest) :: rest2 ->
+    match rest with
+    | [] -> failwith "fail"
+    | h :: t -> t :: get_aget_ball_list rest2
 ;;
 
-let calc_dis3 =
-  function
-  | Ball(B_Pos_x a , B_Pos_y b , c , d) ->
-  | Agent(Team str , Label a , Pos_x a2 , Pos_y a3 ,
-          V_x  a4 , V_y a5)
+let agent_xy = get_aget_ball_list test_data;;
+
+(* !!! *)
+
+
+
+(* !!! *)
+
+let rec calc_distance agent ball_d =
+  match agent with
+  | [] -> []
+  | Agent (Team str , Label l, Pos_x x, Pos_y y, V_x vx, V_y vy) :: rest
     ->
+    begin
+      match ball_d with
+      | (h1,h2) :: t ->
+        (str^" "^(string_of_float l) ,
+         sqrt(((x -. h1) ** 2.0) +. (y -. h2) ** 2.0))
+        :: calc_distance rest t
+      | _ -> failwith "no ball"
+    end
+  | _ -> failwith "fail calc_distance"
 ;;
-*)
+
+let rec calc_distance2 agent ball_d =
+  match agent with
+  | [] -> []
+  | head :: rest -> calc_distance head ball_d:: calc_distance2 rest ball_d
+;;
+
+let ball_agent_distance = calc_distance2 agent_xy ball_xy;;
+
+let rec minimum l m =
+  match l with
+  | [] ->
+    begin
+    match m with
+    | (a,b) as t -> if b < 3.0 then t else ("None",0.0)
+    end
+  | (s,f) as a :: r ->
+    begin
+    match m with
+    | (s2,f2) ->
+      if f < f2
+      then minimum r a
+      else minimum r m
+    end
+
+;;
+
+let rec ball_holder ba =
+  match ba with
+  | [] -> []
+  | h :: t -> minimum h ("Start",10000.0) :: ball_holder t
+;;
+
+let bf = ball_holder ball_agent_distance;;
+
+let create_number_file filename strnum_tup =
+  let outc = Out_channel.create "file-test.txt" in
+  List.iter strnum_tup ~f:(fun (x,y) -> fprintf outc "%s, %f\n" x y);
+  Out_channel.close outc
+;;
+
+
+create_number_file "file-test.txt" bf;;
