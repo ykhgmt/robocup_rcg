@@ -17,7 +17,6 @@ type agent_distance =
 | Record_dis of (sec * agent_dist list)
 | Records_dis of (sec * agent_dist list) list
 ;;
-
 *)
 
 let rcg_matc op =
@@ -43,35 +42,38 @@ let elm_agent e =
 
 let test_data = elm_agent rcg_data;;
 
+let i = ref 0;;
+
 let rec get_ball_x_y c =
   match c with
   | [] -> []
   | (Cycle num , rest) :: rest2 ->
+(*    print_string "n";print_int num ; print_string " "; *)
     match rest with
     | [] -> failwith "fail"
     | Ball(B_Pos_x x,B_Pos_y y,B_V_x vx, B_V_y vy) :: t ->
-      (x,y) :: get_ball_x_y rest2
+(*    print_string "b";print_int !i ; print_newline () ; i := !i + 1; *)
+      (num,x,y) :: get_ball_x_y rest2
     | _ -> failwith "fail"
 ;;
 
 let ball_xy = get_ball_x_y test_data;;
 
-let rec get_aget_ball_list c =
+let i = ref 0;;
+
+let rec get_agent_list c =
   match c with
   | [] -> []
   | (Cycle num , rest) :: rest2 ->
+    (* print_int num ; print_string " "; *)
     match rest with
     | [] -> failwith "fail"
-    | h :: t -> t :: get_aget_ball_list rest2
+    | h :: t ->
+(*      print_int !i ; print_string " " ; i := !i + 1; *)
+      t :: get_agent_list rest2
 ;;
 
-let agent_xy = get_aget_ball_list test_data;;
-
-(* !!! *)
-
-
-
-(* !!! *)
+let agent_xy = get_agent_list test_data;;
 
 let rec calc_distance agent ball_d =
   match agent with
@@ -80,19 +82,27 @@ let rec calc_distance agent ball_d =
     ->
     begin
       match ball_d with
-      | (h1,h2) :: t ->
-        (str^" "^(string_of_float l) ,
-         sqrt(((x -. h1) ** 2.0) +. (y -. h2) ** 2.0))
+      | (num,h1,h2) as t ->
+        ( (string_of_int num) ^ " , " ^ str ^ " " ^ (string_of_float l) ,
+          (sqrt((((x -. h1) *. (x -. h1))) +. ((y -. h2) *. (y -. h2)))))
         :: calc_distance rest t
-      | _ -> failwith "no ball"
     end
   | _ -> failwith "fail calc_distance"
 ;;
 
+(*let i = ref 0;; *)
+
 let rec calc_distance2 agent ball_d =
   match agent with
   | [] -> []
-  | head :: rest -> calc_distance head ball_d:: calc_distance2 rest ball_d
+  | head :: rest ->
+    begin
+      match ball_d with
+      | [] -> []
+      | head_b :: rest_b ->
+      (*  print_int !i ; print_string " " ; i := !i + 1; *)
+        calc_distance head head_b  :: calc_distance2 rest rest_b
+    end
 ;;
 
 let ball_agent_distance = calc_distance2 agent_xy ball_xy;;
@@ -101,18 +111,17 @@ let rec minimum l m =
   match l with
   | [] ->
     begin
-    match m with
-    | (a,b) as t -> if b < 3.0 then t else ("None",0.0)
+      match m with
+      | (a,b) as t -> if b < 2.0 then t else ("None",0.0)
     end
   | (s,f) as a :: r ->
     begin
-    match m with
-    | (s2,f2) ->
-      if f < f2
-      then minimum r a
+      match m with
+      | (s2,f2) ->
+        if f < f2
+        then minimum r a
       else minimum r m
     end
-
 ;;
 
 let rec ball_holder ba =
@@ -128,6 +137,5 @@ let create_number_file filename strnum_tup =
   List.iter strnum_tup ~f:(fun (x,y) -> fprintf outc "%s, %f\n" x y);
   Out_channel.close outc
 ;;
-
 
 create_number_file "file-test.txt" bf;;
