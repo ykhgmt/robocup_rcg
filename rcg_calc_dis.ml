@@ -83,14 +83,14 @@ let rec calc_distance agent ball_d =
     begin
       match ball_d with
       | (num,h1,h2) as t ->
-        ( (string_of_int num) ^ " , " ^ str ^ " " ^ (string_of_float l) ,
+        ( num , str ^ " " ^ (string_of_float l) ,
           (sqrt((((x -. h1) *. (x -. h1))) +. ((y -. h2) *. (y -. h2)))))
         :: calc_distance rest t
     end
   | _ -> failwith "fail calc_distance"
 ;;
 
-(*let i = ref 0;; *)
+(* let i = ref 0;; *)
 
 let rec calc_distance2 agent ball_d =
   match agent with
@@ -112,12 +112,12 @@ let rec minimum l m =
   | [] ->
     begin
       match m with
-      | (a,b) as t -> if b < 2.0 then t else ("None",0.0)
+      | (num,a,b) as t -> if b < 2.0 then t else (-1,"None",-1.0)
     end
-  | (s,f) as a :: r ->
+  | (num,s,f) as a :: r ->
     begin
       match m with
-      | (s2,f2) ->
+      | (num2,s2,f2) ->
         if f < f2
         then minimum r a
       else minimum r m
@@ -127,15 +127,31 @@ let rec minimum l m =
 let rec ball_holder ba =
   match ba with
   | [] -> []
-  | h :: t -> minimum h ("Start",10000.0) :: ball_holder t
+  | h :: t -> minimum h (0, "Start",10000.0) :: ball_holder t
 ;;
 
 let bf = ball_holder ball_agent_distance;;
 
+
 let create_number_file filename strnum_tup =
-  let outc = Out_channel.create "file-test.txt" in
-  List.iter strnum_tup ~f:(fun (x,y) -> fprintf outc "%s, %f\n" x y);
+  let outc = Out_channel.create filename in
+  List.iter strnum_tup ~f:(fun (n,x,y) -> fprintf outc "%d , %s , %f\n" n x y);
   Out_channel.close outc
 ;;
 
+(*
 create_number_file "file-test.txt" bf;;
+*)
+
+let rec none_rm a =
+  match a with
+  | [] -> []
+  | f :: r ->
+    match f with
+    | (-1 , "None" , -1.0) -> [] @ none_rm r
+    | (num , label , distance) -> [(num , label , distance)] @ none_rm r
+;;
+
+let ballh = none_rm bf;;
+
+create_number_file "ballh.csv" ballh;;
