@@ -33,7 +33,6 @@ let rec cycle_rm sa =
       a :: cycle_rm rest
 ;;
 
-let test_data = (elm_agent rcg_data);;
 let test_data = cycle_rm(elm_agent rcg_data);;
 
 let i = ref 0;;

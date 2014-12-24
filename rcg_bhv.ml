@@ -41,12 +41,12 @@ let rec dp_match_l b =
     match a with
     | D(rs) ->
       if (String.get rs.age 0) = 'l'
-      then [Record_dp(D(rs))] @ dp_match rest
-      else [] @ dp_match rest
+      then [Record_dp(D(rs))] @ dp_match_l rest
+      else [] @ dp_match_l rest
     | P(rs) ->
       if (((String.get rs.age1 0) = 'l') && ((String.get rs.age2 0) = 'l'))
-      then [Record_dp(P(rs))] @ dp_match rest
-      else [] @ dp_match rest
+      then [Record_dp(P(rs))] @ dp_match_l rest
+      else [] @ dp_match_l rest
 ;;
 
-let drib_pass = dp_match dplist;;
+let drib_pass = dp_match_l dplist;;
