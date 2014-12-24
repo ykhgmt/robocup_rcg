@@ -1,6 +1,3 @@
-drib_pass;;
-test_data;;
-
 let rec drib_rm dp =
   match dp with
   | [] -> []
@@ -18,7 +15,7 @@ let rec pos_pre_trans dp ab =
   | Record_dp(P(rs)) :: rest ->
     match ab with
     | [] -> []
-    | h :: r as hr ->
+    | h :: r ->
       let rec pos_pre_trans2 ab2 =
         match ab2 with
         | [] -> failwith "None2"
@@ -37,9 +34,68 @@ let rec pos_pre_trans dp ab =
                  (pos_pre_trans3 agenb rs.age1,
                   pos_pre_trans3 agenb rs.age2))
         | (Cycle num , agenb) :: rest2 -> pos_pre_trans2 rest2
-      in pos_pre_trans2 hr :: pos_pre_trans rest r
+      in pos_pre_trans2 ab :: pos_pre_trans rest r
 ;;
 
-let test = pos_pre_trans pass test_data;;
+let pass_d = pos_pre_trans pass test_data;;
 
-List.length test;;
+let rec compe a b =
+  match a with
+  | [] -> []
+  | Record_dp(P(hs)) :: r ->
+    begin
+      match b with
+      | [] -> []
+      | h2 :: r2 ->
+        (hs.sec_p,h2) :: compe r r2
+    end
+  | _ -> failwith "fail compe"
+;;
+
+let compe_pass_pass_d = compe pass pass_d;;
+
+(*
+test_data;;
+drib_pass;;
+*)
+
+let rec pos_pass_enemy agenb (x,y) =
+    match agenb with
+    | [] -> []
+    | Ball(b) :: rest -> pos_pass_enemy rest (x,y)
+    | Agent(Team t,Label l,Pos_x px,Pos_y py,vx,vy) :: rest
+        when t = "r" && (px > x
+              && (((sqrt((x -. px) ** 2.0)
+                    +. ((y -. py) ** 2.0))) < 10.0))
+          -> (t ^ (string_of_float l)) :: pos_pass_enemy rest (x,y)
+    | Agent(t,Label l,Pos_x px,Pos_y py,vx,vy) :: rest
+      -> pos_pass_enemy rest (x,y)
+;;
+
+let rec pd_pos dp ab =
+  match dp with
+  | [] -> []
+  | Record_dp(D(rs)) :: rest -> failwith "None drrible"
+  | Record_dp(P(rs)) :: rest ->
+    match ab with
+    | [] -> []
+    | h :: r ->
+      let rec pos_pre_trans2 ab2 =
+        match ab2 with
+        | [] -> failwith "None2"
+        | (Cycle num , agenb) :: rest2 when num = rs.sec_p ->
+          let rec pos_pre_trans3 agenb ll =
+            match agenb with
+            | [] -> []
+            | Ball(rs_b) :: rest3 -> pos_pre_trans3 rest3 ll
+            | Agent(Team t,Label l,Pos_x px,Pos_y py,vx,vy) :: rest3
+                when (t ^ " " ^ (string_of_float l)) = ll  ->
+              pos_pass_enemy agenb (px,py)
+            | Agent(t,Label l,Pos_x px,Pos_y py,vx,vy) :: rest3
+              -> pos_pre_trans3 rest3 ll
+          in (pos_pre_trans3 agenb rs.age1,pos_pre_trans3 agenb rs.age2)
+        | (Cycle num , agenb) :: rest2 -> pos_pre_trans2 rest2
+      in pos_pre_trans2 ab :: pd_pos rest r
+;;
+
+compe pass (pd_pos pass test_data);;
