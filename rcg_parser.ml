@@ -14,9 +14,9 @@ module Sexp : sig
 end
 *)
 
-let str = In_channel.input_all(In_channel.create("helios-test_small.txt"));;
-let str = In_channel.input_all(In_channel.create("201212041405-HillStone_2-vs-NiseStone_1.rcg"));;
-
+let str = In_channel.input_all(In_channel.create("helios-test.txt"));;
+(*let str = In_channel.input_all(In_channel.create("201212041405-HillStone_2-vs-NiseStone_1.rcg"));;
+*)
 (*
 201212041405-HillStone_2-vs-NiseStone_1.rcg
 *)

@@ -1,24 +1,5 @@
 open Pervasives;;
 
-(*
-type dis =
-| Dis of float
-;;
-
-type agent_dis =
-| A_teaminf of string
-| Distance of dis
-;;
-
-type agent_dist =
-| Agent_d of ( agent_dis * agent_dis)
-
-type agent_distance =
-| Record_dis of (sec * agent_dist list)
-| Records_dis of (sec * agent_dist list) list
-;;
-*)
-
 let rcg_matc op =
   match op with
   | Rcg_m(a) -> []
@@ -40,7 +21,20 @@ let elm_agent e =
   | _ -> failwith "fail calc_dis"
 ;;
 
-let test_data = elm_agent rcg_data;;
+let rec cycle_rm sa =
+  match sa with
+  | [] -> []
+  | (Cycle num,agenb) as a:: rest ->
+    match rest with
+    | [] -> []
+    | (Cycle num2,agenb2) :: rest2 when num = num2 ->
+      [] @ cycle_rm rest
+    | (Cycle num2,agenb2)  :: rest2 ->
+      a :: cycle_rm rest
+;;
+
+let test_data = (elm_agent rcg_data);;
+let test_data = cycle_rm(elm_agent rcg_data);;
 
 let i = ref 0;;
 
@@ -48,11 +42,11 @@ let rec get_ball_x_y c =
   match c with
   | [] -> []
   | (Cycle num , rest) :: rest2 ->
-(*    print_string "n";print_int num ; print_string " "; *)
+    (*    print_string "n";print_int num ; print_string " "; *)
     match rest with
     | [] -> failwith "fail"
     | Ball(B_Pos_x x,B_Pos_y y,B_V_x vx, B_V_y vy) :: t ->
-(*    print_string "b";print_int !i ; print_newline () ; i := !i + 1; *)
+      (* print_string "b";print_int !i ; print_newline () ; i := !i + 1; *)
       (num,x,y) :: get_ball_x_y rest2
     | _ -> failwith "fail"
 ;;
@@ -69,7 +63,7 @@ let rec get_agent_list c =
     match rest with
     | [] -> failwith "fail"
     | h :: t ->
-(*      print_int !i ; print_string " " ; i := !i + 1; *)
+(*  print_int !i ; print_string " " ; i := !i + 1; *)
       t :: get_agent_list rest2
 ;;
 
