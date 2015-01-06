@@ -133,14 +133,67 @@ let rec pd_zone dp ab =
 
 compe pass (pd_zone pass test_data);;
 
-(*
-  test_data;;
-  drib_pass;;
-*)
-(*
-let rec positive_data s_ab =
-  match s_ab with
+let rec pos_data salist =
+  match salist with
   | [] -> []
-  | (c,ab) :: rest
-      ->
-*)
+  | h :: r ->
+    match h with
+    | (Cycle s , ablist) ->
+      match ablist with
+      | [] -> []
+      | Ball(B_Pos_x x,B_Pos_y y,B_V_x vx,B_V_y vy) :: rest ->
+        (s,x) :: pos_data r
+      | Agent(a) :: rest -> [] @ pos_data r
+;;
+
+let pos = pos_data test_data
+
+let rec pos_data_r =
+  function
+  | [] -> []
+  | (s,b) :: rest ->
+    let rec pos_data2 s b rest =
+      match rest with
+      | [] -> []
+      | q::w::e::r::t::(s2,b2) :: rest2 ->
+        if b > b2
+        then (s,s2) :: pos_data_r rest2
+        else pos_data2 s b2 rest2
+    in pos_data2 s b rest
+;;
+
+pos_data_r pos;;
+
+let rec pos_data_sele d =
+  match d with
+  | [] -> []
+  | (b1,b2) :: rest when b1+6 = b2 -> [] @ pos_data_sele rest
+  | (b1,b2) as a :: rest -> a :: pos_data_sele rest
+;;
+
+let pos_sec = pos_data_sele (pos_data_r pos);;
+
+drib_pass;;
+pos_sec;;
+
+let rec pos_dpass dp pos =
+  match pos with
+  | [] -> []
+  | (s1,s2) :: rest ->
+    let rec pos_dpass2 s1 s2 dp =
+      match dp with
+      | [] -> []
+      | (Record_dp(D(a))) as rs :: rest2
+          when (a.sec_d >= s1) && a.sec_d <= s2
+            -> [rs] @ pos_dpass2 s1 s2 rest2
+      | (Record_dp(P(a))) as rs :: rest2
+          when a.sec_p >= s1 && a.sec_p <= s2
+            -> [rs] @ pos_dpass2 s1 s2 rest2
+      | (Record_dp(D(a))) :: rest2
+            -> pos_dpass2 s1 s2 rest2
+      | (Record_dp(P(a))) :: rest2
+            -> pos_dpass2 s1 s2 rest2
+    in pos_dpass2 s1 s2 dp :: pos_dpass dp rest
+;;
+
+pos_dpass drib_pass pos_sec;;
