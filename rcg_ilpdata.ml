@@ -197,3 +197,12 @@ let rec pos_dpass dp pos =
 ;;
 
 pos_dpass drib_pass pos_sec;;
+
+let rec pos_leng p leng =
+  match p with
+  | [] -> []
+  | (a,b) as c :: rest when ((b - a) > leng) -> c :: aa rest
+  | (a,b) :: rest -> aa rest
+;;
+
+pos_leng pos_sec 80;;
