@@ -54,6 +54,15 @@ let rec compe a b =
 
 let compe_pass_pass_d = compe pass pass_d;;
 
+let rec l_pas p =
+  match p with
+  | [] -> []
+  | (s,l) :: rest when l > 13.0 -> l :: l_pas rest
+  | (s,l) :: rest -> l_pas rest
+;;
+
+
+let long_pass = compe pass (l_pas compe_pass_pass_d);;
 
 let rec pos_pass_enemy agenb (x,y) =
     match agenb with
@@ -94,8 +103,7 @@ let rec pd_pos dp ab =
       in pos_pre_trans2 ab :: pd_pos rest r
 ;;
 
-compe pass (pd_pos pass test_data);;
-
+let pass_enemy_near = compe pass (pd_pos pass test_data);;
 
 let rec pass_zone y =
   if y < -13.0
@@ -131,7 +139,7 @@ let rec pd_zone dp ab =
       in pd_zone2 ab :: pd_zone rest r
 ;;
 
-compe pass (pd_zone pass test_data);;
+let pass_zone_list = compe pass (pd_zone pass test_data);;
 
 let rec pos_data salist =
   match salist with
@@ -205,4 +213,4 @@ let rec pos_leng p leng =
   | (a,b) :: rest -> aa rest
 ;;
 
-pos_leng pos_sec 80;;
+let positive_length = pos_leng pos_sec 80;;
