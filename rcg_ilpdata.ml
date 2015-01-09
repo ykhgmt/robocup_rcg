@@ -209,8 +209,8 @@ pos_dpass drib_pass pos_sec;;
 let rec pos_leng p leng =
   match p with
   | [] -> []
-  | (a,b) as c :: rest when ((b - a) > leng) -> c :: aa rest
-  | (a,b) :: rest -> aa rest
+  | (a,b) as c :: rest when ((b - a) > leng) -> c :: pos_leng rest leng
+  | (a,b) :: rest -> pos_leng rest leng
 ;;
 
 let positive_length = pos_leng pos_sec 80;;
