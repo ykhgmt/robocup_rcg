@@ -138,13 +138,61 @@ let rec long_pre gaph lp=
     in long_pre2 gaph s @ long_pre gaph rest_lp
 ;;
 
-pos_selection_pass;;
-long_pass;;
-
 let long_predicate = long_pre good_ac_pass_hasac long_pass;;
 
-(*
-let enemy_pre gaph=
+let p_or_a pa h =
+    if pa = "p" then ("enemy_p(" ^ h ^ ").")
+    else if  pa = "a" then ("enemy_a(" ^ h ^ ").")
+    else failwith "fail p_or_a"
 ;;
-let enemy_predicate = ;;
+
+let rec enemy_pre_gen pa s gaph =
+  match gaph with
+  | [] -> []
+  | (asec,t) :: rest ->
+    let rec enemy_pre_gen2 pa s t =
+      match t with
+      | [] -> []
+      | h :: r when (List.nth(String.split h '_') 2)
+          = (Some (string_of_int s))
+            -> (p_or_a pa h) :: enemy_pre_gen2 pa s r
+      | h :: r
+        -> enemy_pre_gen2 pa s r
+    in enemy_pre_gen2 pa s t @ enemy_pre_gen pa s rest
+;;
+
+
+let rec enemy_pre gaph pen =
+  match pen with
+  | [] -> []
+  | (s,(e1,e2)) :: rest when e1 != [] && e2 != [] ->
+    enemy_pre_gen "p" s gaph @ enemy_pre_gen "a" s gaph
+    @  enemy_pre gaph rest
+  | (s,(e1,e2)) :: rest when e1 != [] ->
+    enemy_pre_gen "p" s gaph @ enemy_pre gaph rest
+  | (s,(e1,e2)) :: rest when e2 != [] ->
+    enemy_pre_gen "a" s gaph @ enemy_pre gaph rest
+  | (s,(e1,e2)) :: rest ->
+    enemy_pre gaph rest
+;;
+
+let enemy_predicate = enemy_pre good_ac_pass_hasac pass_enemy_near;;
+
+(*
+order
 *)
+
+let rec order_pre gaph =
+  match gaph with
+  | [] -> []
+  | (s,pr) :: rest ->
+    let rec order_pre2 pr =
+      match pr with
+      | [] -> []
+      | h :: h2 :: r ->
+        ("order(" ^ h ^ "," ^ h2 ^ ").") :: order_pre2 (h2::r)
+      | h :: r -> []
+    in order_pre2 pr @ order_pre rest
+;;
+
+let order_predicate = order_pre good_ac_pass_hasac;;
