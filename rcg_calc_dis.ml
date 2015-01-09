@@ -132,10 +132,6 @@ let create_number_file filename strnum_tup =
   Out_channel.close outc
 ;;
 
-(*
-create_number_file "file-test.txt" bf;;
-*)
-
 let rec none_rm a =
   match a with
   | [] -> []
