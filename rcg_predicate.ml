@@ -117,7 +117,7 @@ let rec has_a_pre gaph =
     in (has_a_pre2 s r) @ has_a_pre rest
 ;;
 
-let has_a_pre = has_a_pre good_ac_pass_hasac;;
+let has_a_predicate = has_a_pre good_ac_pass_hasac;;
 
 let rec long_pre gaph lp=
   match lp with
@@ -178,10 +178,6 @@ let rec enemy_pre gaph pen =
 
 let enemy_predicate = enemy_pre good_ac_pass_hasac pass_enemy_near;;
 
-(*
-order
-*)
-
 let rec order_pre gaph =
   match gaph with
   | [] -> []
@@ -196,3 +192,36 @@ let rec order_pre gaph =
 ;;
 
 let order_predicate = order_pre good_ac_pass_hasac;;
+
+let rec zone_pre zone gaph =
+  match zone with
+  | [] -> []
+  | (s,(z1,z2)) :: rest ->
+    let rec zone_pre2 s gaph =
+      match gaph with
+      | [] -> []
+      | (sec,pre) :: rest ->
+        let rec zone_pre3 s pre =
+          match pre with
+          | [] -> []
+          | h :: r when (List.nth(String.split h '_') 2)
+              = (Some (string_of_int s)) ->
+            ("zone(" ^ h ^ "," ^ (string_of_int z1) ^ "," ^ (string_of_int z2) ^ ").")
+            :: zone_pre3 s r
+          | h :: r -> zone_pre3 s r
+        in zone_pre3 s pre @ zone_pre2 s rest
+    in zone_pre2 s gaph @ zone_pre rest gaph
+;;
+
+let zone_predicate = zone_pre pass_zone_list good_ac_pass_hasac;;
+
+let create_number_file filename strnum_tup =
+  let outc = Out_channel.create filename in
+  List.iter strnum_tup ~f:(fun p -> fprintf outc "%s \n" p);
+  Out_channel.close outc
+;;
+
+create_number_file "progol_data.pl"
+  (good_predicate @ ac_predicate @ pass_predicate
+   @ has_a_predicate @ zone_predicate @ order_predicate
+  @ enemy_predicate @ long_predicate);;
