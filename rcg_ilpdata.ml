@@ -57,7 +57,7 @@ let compe_pass_pass_d = compe pass pass_d;;
 let rec l_pas p =
   match p with
   | [] -> []
-  | (s,l) :: rest when l > 13.0 -> l :: l_pas rest
+  | (s,l) :: rest when l > 10.0 -> l :: l_pas rest
   | (s,l) :: rest -> l_pas rest
 ;;
 
@@ -110,7 +110,7 @@ let rec pass_zone y =
   then 1
   else if (y >= -13.0) && (y <= 13.0)
   then 2
-  else 3
+  else 1
 ;;
 
 let rec pd_zone dp ab =

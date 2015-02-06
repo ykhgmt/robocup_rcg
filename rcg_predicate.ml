@@ -52,7 +52,17 @@ let rec pos_selec pass pos =
     in pos_selec2 sec pass :: pos_selec pass rest
 ;;
 
-let pos_selection_pass = pos_selec pass positive_length;;
+let pos_selection_pass_p = pos_selec pass positive_length;;
+
+let rec pos_list_length r =
+  match r with
+  | [] -> []
+  | h :: r when ((List.length h) > 5) -> h :: pos_list_length r
+  | h :: r -> pos_list_length r
+;;
+
+let pos_selection_pass = pos_list_length pos_selection_pass_p;;
+
 
 let type_pass_r p =
   let rec type_pass p c =
