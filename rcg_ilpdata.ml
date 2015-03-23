@@ -154,7 +154,7 @@ let rec pos_data salist =
       | Agent(a) :: rest -> [] @ pos_data r
 ;;
 
-let pos = pos_data test_data
+let pos = pos_data test_data;;
 
 let rec pos_data_r =
   function
@@ -213,4 +213,5 @@ let rec pos_leng p leng =
   | (a,b) :: rest -> pos_leng rest leng
 ;;
 
+(*let positive_length = pos_leng pos_sec 40;;*)
 let positive_length = pos_leng pos_sec 80;;

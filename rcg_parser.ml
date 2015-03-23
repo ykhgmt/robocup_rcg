@@ -14,12 +14,20 @@ module Sexp : sig
 end
 *)
 
-let str = In_channel.input_all(In_channel.create("helios-test.txt"));;
-(*let str = In_channel.input_all(In_channel.create("201212041405-HillStone_2-vs-NiseStone_1.rcg"));;
-*)
-(*
-201212041405-HillStone_2-vs-NiseStone_1.rcg
-*)
+(*let str = In_channel.input_all(In_channel.create("helios-test.txt"));;*)
+(*let str = In_channel.input_all(In_channel.create("201212041405-HillStone_2-vs-NiseStone_1.rcg"));;*)
+(*let filen = "201404072336-HillStone_6-vs-HELIOS_base_4.rcg";;*)
+(*let filen = "201405041119-HillStone_6-vs-hagimoto_2.rcg";;*)
+let filen = "201405040953-Hill_new_7-vs-HillStone_2.rcg";;
+
+let str = In_channel.input_all(In_channel.create(filen));;
+
+(* succees *)
+
+(*let str = In_channel.input_all(In_channel.create("201404221126-HillStone_7-vs-HELIOS_base_3_progol.rcg"));;*)
+
+(*let str = In_channel.input_all(In_channel.create("201405051006-HillStone_7-vs-hill_was_1.rcg"));;*)
+
 type agent =
   Team of string
 | Label of float
@@ -141,6 +149,7 @@ let parse_lex s =
 ;;
 
 (* test *)
+
 (*
 let rec parse_t_list s =
   match s with

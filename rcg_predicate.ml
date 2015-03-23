@@ -58,9 +58,11 @@ let rec pos_list_length r =
   match r with
   | [] -> []
   | h :: r when ((List.length h) > 5) -> h :: pos_list_length r
+(*  | h :: r when ((List.length h) > 3) -> h :: pos_list_length r*)
   | h :: r -> pos_list_length r
 ;;
 
+(*let pos_selection_pass = pos_list_length pos_selection_pass_p;; *)
 let pos_selection_pass = pos_list_length pos_selection_pass_p;;
 
 
@@ -231,7 +233,9 @@ let create_number_file filename strnum_tup =
   Out_channel.close outc
 ;;
 
-create_number_file "progol_data.pl"
-  (good_predicate @ ac_predicate @ pass_predicate
+let filenw = ["(*"^filen^"*)"];;
+
+create_number_file ("progol_data_" ^ filen ^ ".pl")
+  (filenw @ good_predicate @ ac_predicate @ pass_predicate
    @ has_a_predicate @ zone_predicate @ order_predicate
   @ enemy_predicate @ long_predicate);;
