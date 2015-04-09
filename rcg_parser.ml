@@ -16,9 +16,16 @@ end
 
 (*let str = In_channel.input_all(In_channel.create("helios-test.txt"));;*)
 (*let str = In_channel.input_all(In_channel.create("201212041405-HillStone_2-vs-NiseStone_1.rcg"));;*)
-(*let filen = "201404072336-HillStone_6-vs-HELIOS_base_4.rcg";;*)
+
+(*succees*)
+let filen = "201404072336-HillStone_6-vs-HELIOS_base_4.rcg";;
+
+(*fail???*)
 (*let filen = "201405041119-HillStone_6-vs-hagimoto_2.rcg";;*)
-let filen = "201405040953-Hill_new_7-vs-HillStone_2.rcg";;
+(*let filen = "201405040953-Hill_new_7-vs-HillStone_2.rcg";;*)
+
+(*let filen = "201503231738-HillStone_7-vs-Fifty-Storms_0_progol.rcg";;*)
+
 
 let str = In_channel.input_all(In_channel.create(filen));;
 
