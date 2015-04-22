@@ -57,10 +57,9 @@ let compe_pass_pass_d = compe pass pass_d;;
 let rec l_pas p =
   match p with
   | [] -> []
-  | (s,l) :: rest when l > 10.0 -> l :: l_pas rest
+  | (s,l) :: rest when l > long_pass_distance -> l :: l_pas rest
   | (s,l) :: rest -> l_pas rest
 ;;
-
 
 let long_pass = compe pass (l_pas compe_pass_pass_d);;
 
@@ -106,9 +105,9 @@ let rec pd_pos dp ab =
 let pass_enemy_near = compe pass (pd_pos pass test_data);;
 
 let rec pass_zone y =
-  if y < -13.0
+  if y < pass_zone_y_1
   then 1
-  else if (y >= -13.0) && (y <= 13.0)
+  else if (y >= pass_zone_y_1) && (y <= pass_zone_y_2)
   then 2
   else 1
 ;;
@@ -188,20 +187,20 @@ let rec pos_dpass dp pos =
   match pos with
   | [] -> []
   | (s1,s2) :: rest ->
-    let rec pos_dpass2 s1 s2 dp =
-      match dp with
-      | [] -> []
-      | (Record_dp(D(a))) as rs :: rest2
-          when (a.sec_d >= s1) && a.sec_d <= s2
-            -> [rs] @ pos_dpass2 s1 s2 rest2
-      | (Record_dp(P(a))) as rs :: rest2
-          when a.sec_p >= s1 && a.sec_p <= s2
-            -> [rs] @ pos_dpass2 s1 s2 rest2
-      | (Record_dp(D(a))) :: rest2
-            -> pos_dpass2 s1 s2 rest2
-      | (Record_dp(P(a))) :: rest2
-            -> pos_dpass2 s1 s2 rest2
-    in pos_dpass2 s1 s2 dp :: pos_dpass dp rest
+     let rec pos_dpass2 s1 s2 dp =
+       match dp with
+       | [] -> []
+       | (Record_dp(D(a))) as rs :: rest2
+            when (a.sec_d >= s1) && a.sec_d <= s2
+         -> [rs] @ pos_dpass2 s1 s2 rest2
+       | (Record_dp(P(a))) as rs :: rest2
+            when a.sec_p >= s1 && a.sec_p <= s2
+         -> [rs] @ pos_dpass2 s1 s2 rest2
+       | (Record_dp(D(a))) :: rest2
+         -> pos_dpass2 s1 s2 rest2
+       | (Record_dp(P(a))) :: rest2
+         -> pos_dpass2 s1 s2 rest2
+     in pos_dpass2 s1 s2 dp :: pos_dpass dp rest
 ;;
 
 pos_dpass drib_pass pos_sec;;
@@ -214,4 +213,4 @@ let rec pos_leng p leng =
 ;;
 
 (*let positive_length = pos_leng pos_sec 40;;*)
-let positive_length = pos_leng pos_sec 80;;
+let positive_length = pos_leng pos_sec positive_sec;;
